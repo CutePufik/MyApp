@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,51 +20,101 @@ import androidx.compose.material.icons.filled.Face
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Observer
+import com.example.myapplication.R
 import com.example.myapplication.data.AppItem
+import com.example.myapplication.ui.theme.MyApplicationTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun AppListScreen(
-    apps: List<AppItem>,
+    viewModel: AppListViewModel,
     onAppClick: (Int) -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-    ) {
-        Header()
+    val uiState by viewModel.uiState.observeAsState(AppListUiState())
+    val snackbarHostState = remember { SnackbarHostState() }
+    val logoClickedMessage = stringResource(R.string.logo_clicked_snackbar)
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val scope = rememberCoroutineScope()
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(apps) { app ->
-                AppListItem(
-                    app = app,
-                    onClick = { onAppClick(app.id) }
-                )
-                HorizontalDivider(color = Color(0xFFEAEAEA), thickness = 1.dp)
+    DisposableEffect(viewModel, lifecycleOwner, snackbarHostState, logoClickedMessage) {
+        val observer = Observer<Boolean> { show ->
+            if (show == true) {
+                viewModel.onLogoSnackbarShown()
+                scope.launch {
+                    snackbarHostState.showSnackbar(message = logoClickedMessage)
+                }
+            }
+        }
+        viewModel.showLogoClickedSnackbar.observe(lifecycleOwner, observer)
+        onDispose { viewModel.showLogoClickedSnackbar.removeObserver(observer) }
+    }
+
+    AppListScreen(
+        uiState = uiState,
+        snackbarHostState = snackbarHostState,
+        onLogoClick = viewModel::onLogoClick,
+        onAppClick = onAppClick
+    )
+}
+
+@Composable
+private fun AppListScreen(
+    uiState: AppListUiState,
+    snackbarHostState: SnackbarHostState,
+    onLogoClick: () -> Unit,
+    onAppClick: (Int) -> Unit
+) {
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        containerColor = MaterialTheme.colorScheme.background
+    ) { contentPadding ->
+        Column(modifier = Modifier.padding(contentPadding)) {
+            Header(onLogoClick = onLogoClick)
+
+            LazyColumn {
+                items(uiState.apps) { app ->
+                    AppListItem(
+                        app = app,
+                        onClick = { onAppClick(app.id) }
+                    )
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                        thickness = 1.dp
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-private fun Header() {
+private fun Header(onLogoClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(120.dp)
-            .background(Color(0xFF4A6CF7))
+            .background(MaterialTheme.colorScheme.primary)
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
         Row(
@@ -75,16 +124,28 @@ private fun Header() {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "RuStore",
-                color = Color.White,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable(onClick = onLogoClick)
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_rustore),
+                    contentDescription = stringResource(R.string.rustore_title),
+                    modifier = Modifier.size(28.dp)
+                )
+                Spacer(modifier = Modifier.size(10.dp))
+                Text(
+                    text = stringResource(R.string.rustore_title),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+            }
 
             Surface(
                 shape = RoundedCornerShape(14.dp),
-                color = Color.White.copy(alpha = 0.18f)
+                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.18f),
+                modifier = Modifier.clickable(onClick = onLogoClick)
             ) {
                 Box(
                     modifier = Modifier
@@ -93,8 +154,8 @@ private fun Header() {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Face,
-                        contentDescription = "Меню",
-                        tint = Color.White
+                        contentDescription = stringResource(R.string.menu_content_description),
+                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }
@@ -131,7 +192,7 @@ private fun AppListItem(
                 text = app.name,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF1B1B1B)
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -139,7 +200,7 @@ private fun AppListItem(
             Text(
                 text = app.description,
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF333333)
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
             )
 
             Spacer(modifier = Modifier.height(6.dp))
@@ -147,8 +208,31 @@ private fun AppListItem(
             Text(
                 text = app.category,
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AppListScreenPreview() {
+    MyApplicationTheme(dynamicColor = false) {
+        AppListScreen(
+            uiState = AppListUiState(
+                apps = listOf(
+                    AppItem(
+                        id = 1,
+                        name = "Sample App",
+                        description = "Sample description",
+                        category = "Tools",
+                        iconRes = R.drawable.ic_launcher_foreground
+                    )
+                )
+            ),
+            snackbarHostState = remember { SnackbarHostState() },
+            onLogoClick = {},
+            onAppClick = {}
+        )
     }
 }
