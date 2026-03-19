@@ -30,12 +30,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
-import com.example.myapplication.data.AppItem
+import com.example.myapplication.domain.model.App
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 @Composable
 fun AppDetailsScreen(
-    app: AppItem,
+    app: App,
     onBackClick: () -> Unit
 ) {
     Surface(
@@ -130,7 +130,7 @@ fun AppDetailsScreen(
 private fun AppDetailsScreenPreview() {
     MyApplicationTheme(dynamicColor = false) {
         AppDetailsScreen(
-            app = AppItem(
+            app = App(
                 id = 1,
                 name = "Sample App",
                 description = "Sample description",

@@ -1,14 +1,13 @@
-package com.example.myapplication.ui.screen
+package com.example.myapplication.presentation
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.myapplication.data.AppRepository
-
-
-
+import com.example.myapplication.domain.repository.AppRepository
 
 class AppListViewModel : ViewModel() {
+    private val appRepository: AppRepository = AppRepositoryProvider.provide()
+
     private val _uiState = MutableLiveData(AppListUiState())
     val uiState: LiveData<AppListUiState> = _uiState
 
@@ -16,7 +15,7 @@ class AppListViewModel : ViewModel() {
     val showLogoClickedSnackbar: LiveData<Boolean> = _showLogoClickedSnackbar
 
     init {
-        _uiState.value = AppListUiState(apps = AppRepository.apps)
+        _uiState.value = AppListUiState(apps = appRepository.getApps())
     }
 
     fun onLogoClick() {

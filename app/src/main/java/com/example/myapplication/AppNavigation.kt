@@ -1,16 +1,19 @@
 package com.example.myapplication
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.myapplication.data.AppRepository
+import com.example.myapplication.presentation.AppDetailsUiState
+import com.example.myapplication.presentation.AppDetailsViewModel
+import com.example.myapplication.presentation.AppListViewModel
 import com.example.myapplication.ui.screen.AppDetailsScreen
 import com.example.myapplication.ui.screen.AppListScreen
-import com.example.myapplication.ui.screen.AppListViewModel
 
 object Routes {
     const val LIST = "app_list"
@@ -41,10 +44,10 @@ fun AppNavigation() {
                 navArgument("appId") { type = NavType.IntType }
             )
         ) { backStackEntry ->
-            val appId = backStackEntry.arguments?.getInt("appId") ?: -1
-            val app = AppRepository.getAppById(appId)
+            val viewModel: AppDetailsViewModel = viewModel(backStackEntry)
+            val uiState by viewModel.uiState.observeAsState(AppDetailsUiState())
 
-            if (app != null) {
+            uiState.app?.let { app ->
                 AppDetailsScreen(
                     app = app,
                     onBackClick = { navController.popBackStack() }

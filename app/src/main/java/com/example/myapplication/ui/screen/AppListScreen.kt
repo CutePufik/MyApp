@@ -42,7 +42,9 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Observer
 import com.example.myapplication.R
-import com.example.myapplication.data.AppItem
+import com.example.myapplication.domain.model.App
+import com.example.myapplication.presentation.AppListUiState
+import com.example.myapplication.presentation.AppListViewModel
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import kotlinx.coroutines.launch
 
@@ -165,7 +167,7 @@ private fun Header(onLogoClick: () -> Unit) {
 
 @Composable
 private fun AppListItem(
-    app: AppItem,
+    app: App,
     onClick: () -> Unit
 ) {
     Row(
@@ -221,7 +223,7 @@ private fun AppListScreenPreview() {
         AppListScreen(
             uiState = AppListUiState(
                 apps = listOf(
-                    AppItem(
+                    App(
                         id = 1,
                         name = "Sample App",
                         description = "Sample description",
