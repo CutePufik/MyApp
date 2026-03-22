@@ -4,9 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.myapplication.domain.repository.AppRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class AppListViewModel : ViewModel() {
-    private val appRepository: AppRepository = AppRepositoryProvider.provide()
+@HiltViewModel
+class AppListViewModel @Inject constructor(
+    private val appRepository: AppRepository
+) : ViewModel() {
 
     private val _uiState = MutableLiveData(AppListUiState())
     val uiState: LiveData<AppListUiState> = _uiState

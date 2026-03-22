@@ -6,8 +6,11 @@ import com.example.myapplication.data.mapper.toDomain
 import com.example.myapplication.data.mapper.toDomainList
 import com.example.myapplication.domain.model.App
 import com.example.myapplication.domain.repository.AppRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class AppRepositoryImpl : AppRepository {
+@Singleton
+class AppRepositoryImpl @Inject constructor() : AppRepository {
 
 
     private val appsDto = listOf(

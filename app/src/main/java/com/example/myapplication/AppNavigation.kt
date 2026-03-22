@@ -3,7 +3,7 @@ package com.example.myapplication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -29,7 +29,7 @@ fun AppNavigation() {
         startDestination = Routes.LIST
     ) {
         composable(Routes.LIST) {
-            val viewModel: AppListViewModel = viewModel()
+            val viewModel: AppListViewModel = hiltViewModel()
             AppListScreen(
                 viewModel = viewModel,
                 onAppClick = { appId ->
@@ -44,7 +44,7 @@ fun AppNavigation() {
                 navArgument("appId") { type = NavType.IntType }
             )
         ) { backStackEntry ->
-            val viewModel: AppDetailsViewModel = viewModel(backStackEntry)
+            val viewModel: AppDetailsViewModel = hiltViewModel(backStackEntry)
             val uiState by viewModel.uiState.observeAsState(AppDetailsUiState())
 
             uiState.app?.let { app ->
