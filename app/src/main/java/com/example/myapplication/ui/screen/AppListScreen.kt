@@ -46,12 +46,13 @@ import com.example.myapplication.domain.model.App
 import com.example.myapplication.presentation.AppListUiState
 import com.example.myapplication.presentation.AppListViewModel
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 
 @Composable
 fun AppListScreen(
     viewModel: AppListViewModel,
-    onAppClick: (Int) -> Unit
+    onAppClick: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.observeAsState(AppListUiState())
     val snackbarHostState = remember { SnackbarHostState() }
@@ -85,7 +86,7 @@ private fun AppListScreen(
     uiState: AppListUiState,
     snackbarHostState: SnackbarHostState,
     onLogoClick: () -> Unit,
-    onAppClick: (Int) -> Unit
+    onAppClick: (String) -> Unit
 ) {
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -177,14 +178,13 @@ private fun AppListItem(
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = painterResource(id = app.iconRes),
+        AsyncImage(
+            model = app.iconUrl,
             contentDescription = app.name,
             modifier = Modifier
                 .size(64.dp)
                 .clip(RoundedCornerShape(16.dp))
         )
-
         Spacer(modifier = Modifier.size(16.dp))
 
         Column(
@@ -224,11 +224,11 @@ private fun AppListScreenPreview() {
             uiState = AppListUiState(
                 apps = listOf(
                     App(
-                        id = 1,
+                        id = "preview-id",
                         name = "Sample App",
                         description = "Sample description",
                         category = "Tools",
-                        iconRes = R.drawable.ic_launcher_foreground
+                        iconUrl = "https://fastly.picsum.photos/id/237/200/200.jpg"
                     )
                 )
             ),

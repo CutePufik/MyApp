@@ -41,7 +41,7 @@ fun AppNavigation() {
         composable(
             route = "${Routes.DETAILS}/{appId}",
             arguments = listOf(
-                navArgument("appId") { type = NavType.IntType }
+                navArgument("appId") { type = NavType.StringType }
             )
         ) { backStackEntry ->
             val viewModel: AppDetailsViewModel = hiltViewModel(backStackEntry)

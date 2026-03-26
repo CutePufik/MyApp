@@ -3,9 +3,11 @@ package com.example.myapplication.presentation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.myapplication.domain.repository.AppRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class AppListViewModel @Inject constructor(
@@ -19,7 +21,9 @@ class AppListViewModel @Inject constructor(
     val showLogoClickedSnackbar: LiveData<Boolean> = _showLogoClickedSnackbar
 
     init {
-        _uiState.value = AppListUiState(apps = appRepository.getApps())
+        viewModelScope.launch {
+            _uiState.value = AppListUiState(apps = appRepository.getApps())
+        }
     }
 
     fun onLogoClick() {

@@ -1,6 +1,5 @@
 package com.example.myapplication.ui.screen
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.font.FontWeight
@@ -32,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
 import com.example.myapplication.domain.model.App
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import coil.compose.AsyncImage
 
 @Composable
 fun AppDetailsScreen(
@@ -74,8 +73,8 @@ fun AppDetailsScreen(
                     .padding(20.dp),
                 verticalArrangement = Arrangement.Top
             ) {
-                Image(
-                    painter = painterResource(id = app.iconRes),
+                AsyncImage(
+                    model = app.iconUrl,
                     contentDescription = app.name,
                     modifier = Modifier
                         .size(96.dp)
@@ -131,11 +130,11 @@ private fun AppDetailsScreenPreview() {
     MyApplicationTheme(dynamicColor = false) {
         AppDetailsScreen(
             app = App(
-                id = 1,
+                id = "preview-id",
                 name = "Sample App",
                 description = "Sample description",
                 category = "Tools",
-                iconRes = R.drawable.ic_launcher_foreground
+                iconUrl = "https://fastly.picsum.photos/id/237/200/200.jpg"
             ),
             onBackClick = {}
         )

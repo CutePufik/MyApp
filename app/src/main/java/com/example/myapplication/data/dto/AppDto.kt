@@ -1,10 +1,10 @@
 package com.example.myapplication.data.dto
 
 data class AppDto(
-    val id: Int,
+    val id: String,
     val name: String,
     val description: String,
     val category: String,
-    val iconRes: Int
+    val iconUrl: String
 )
 

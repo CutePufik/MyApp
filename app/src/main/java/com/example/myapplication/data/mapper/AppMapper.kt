@@ -8,7 +8,7 @@ fun AppDto.toDomain(): App = App(
     name = name,
     description = description,
     category = category,
-    iconRes = iconRes
+    iconUrl = iconUrl
 )
 
 fun List<AppDto>.toDomainList(): List<App> = map { it.toDomain() }
