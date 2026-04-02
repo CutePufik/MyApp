@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.domain.repository.AppDetailsRepository
-import com.example.myapplication.domain.repository.AppRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,11 +12,9 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 @HiltViewModel
 class AppDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val appRepository: AppRepository,
     private val appDetailsRepository: AppDetailsRepository
 ) : ViewModel() {
 
@@ -29,30 +26,23 @@ class AppDetailsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             try {
-                val app = appRepository.getAppById(appId)
-                if (app != null) {
-                    appDetailsRepository.upsertFromCatalogApp(app)
-                } else {
-                    _state.value = AppDetailsState.Error
-                }
+                loadAppDetails()
+                appDetailsRepository.observeAppDetails(appId)
+                    .catch { _state.value = AppDetailsState.Error }
+                    .collect { appDetails ->
+                        _state.value = AppDetailsState.Content(
+                            appDetails = appDetails,
+                            descriptionCollapsed = false,
+                        )
+                    }
             } catch (_: Exception) {
                 _state.value = AppDetailsState.Error
             }
         }
-        observeAppDetails()
     }
 
-    private fun observeAppDetails() {
-        viewModelScope.launch {
-            appDetailsRepository.observeAppDetails(appId)
-                .catch { _state.value = AppDetailsState.Error }
-                .collect { appDetails ->
-                    _state.value = AppDetailsState.Content(
-                        appDetails = appDetails,
-                        descriptionCollapsed = false,
-                    )
-                }
-        }
+    private suspend fun loadAppDetails() {
+        appDetailsRepository.getAppDetails(appId)
     }
 
     fun toggleWishlist() {

@@ -1,10 +1,9 @@
-package com.example.myapplication.data.local
+package com.example.myapplication.data.appdetails.local
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.myapplication.data.local.entity.AppDetailsEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
