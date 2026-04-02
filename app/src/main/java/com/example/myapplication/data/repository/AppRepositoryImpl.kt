@@ -7,6 +7,8 @@ import com.example.myapplication.domain.model.App
 import com.example.myapplication.domain.repository.AppRepository
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 @Singleton
 class AppRepositoryImpl @Inject constructor(
@@ -19,6 +21,10 @@ class AppRepositoryImpl @Inject constructor(
         } catch (_: Exception) {
             emptyList()
         }
+    }
+
+    override fun observeApps(): Flow<List<App>> = flow {
+        emit(getApps())
     }
 
     override suspend fun getAppById(id: String): App? {

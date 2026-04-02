@@ -12,14 +12,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,14 +33,56 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
-import com.example.myapplication.domain.model.App
+import com.example.myapplication.domain.model.AppDetails
+import com.example.myapplication.presentation.AppDetailsState
+import com.example.myapplication.presentation.AppDetailsViewModel
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import coil.compose.AsyncImage
 
 @Composable
 fun AppDetailsScreen(
-    app: App,
+    viewModel: AppDetailsViewModel,
     onBackClick: () -> Unit
+) {
+    val state by viewModel.state.collectAsState()
+
+    when (val s = state) {
+        is AppDetailsState.Loading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        is AppDetailsState.Error -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.app_details_error),
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        }
+
+        is AppDetailsState.Content -> {
+            AppDetailsScreenContent(
+                appDetails = s.appDetails,
+                onBackClick = onBackClick,
+                onWishlistClick = viewModel::toggleWishlist
+            )
+        }
+    }
+}
+
+@Composable
+private fun AppDetailsScreenContent(
+    appDetails: AppDetails,
+    onBackClick: () -> Unit,
+    onWishlistClick: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -65,6 +112,27 @@ fun AppDetailsScreen(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
                 )
+
+                IconButton(
+                    onClick = onWishlistClick,
+                    modifier = Modifier.align(Alignment.CenterEnd)
+                ) {
+                    Icon(
+                        imageVector = if (appDetails.isInWishlist) {
+                            Icons.Default.Favorite
+                        } else {
+                            Icons.Default.FavoriteBorder
+                        },
+                        contentDescription = stringResource(
+                            if (appDetails.isInWishlist) {
+                                R.string.wishlist_remove_content_description
+                            } else {
+                                R.string.wishlist_add_content_description
+                            }
+                        ),
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
             }
 
             Column(
@@ -74,8 +142,8 @@ fun AppDetailsScreen(
                 verticalArrangement = Arrangement.Top
             ) {
                 AsyncImage(
-                    model = app.iconUrl,
-                    contentDescription = app.name,
+                    model = appDetails.iconUrl,
+                    contentDescription = appDetails.name,
                     modifier = Modifier
                         .size(96.dp)
                         .clip(RoundedCornerShape(24.dp))
@@ -84,7 +152,7 @@ fun AppDetailsScreen(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Text(
-                    text = app.name,
+                    text = appDetails.name,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -93,7 +161,7 @@ fun AppDetailsScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = app.category,
+                    text = appDetails.category,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                 )
@@ -101,7 +169,7 @@ fun AppDetailsScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = app.description,
+                    text = appDetails.description,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
                 )
@@ -128,15 +196,17 @@ fun AppDetailsScreen(
 @Composable
 private fun AppDetailsScreenPreview() {
     MyApplicationTheme(dynamicColor = false) {
-        AppDetailsScreen(
-            app = App(
+        AppDetailsScreenContent(
+            appDetails = AppDetails(
                 id = "preview-id",
                 name = "Sample App",
                 description = "Sample description",
                 category = "Tools",
-                iconUrl = "https://fastly.picsum.photos/id/237/200/200.jpg"
+                iconUrl = "https://fastly.picsum.photos/id/237/200/200.jpg",
+                isInWishlist = true
             ),
-            onBackClick = {}
+            onBackClick = {},
+            onWishlistClick = {}
         )
     }
 }
