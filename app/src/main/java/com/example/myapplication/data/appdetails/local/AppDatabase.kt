@@ -1,8 +1,7 @@
-package com.example.myapplication.data.local
+package com.example.myapplication.data.appdetails.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.example.myapplication.data.local.entity.AppDetailsEntity
 
 @Database(
     entities = [AppDetailsEntity::class],
@@ -11,4 +10,8 @@ import com.example.myapplication.data.local.entity.AppDetailsEntity
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun appDetailsDao(): AppDetailsDao
+
+    companion object {
+        const val DATABASE_NAME = "app_database"
+    }
 }

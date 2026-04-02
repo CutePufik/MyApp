@@ -2,8 +2,8 @@ package com.example.myapplication.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.myapplication.data.local.AppDatabase
-import com.example.myapplication.data.local.AppDetailsDao
+import com.example.myapplication.data.appdetails.local.AppDatabase
+import com.example.myapplication.data.appdetails.local.AppDetailsDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,7 +21,7 @@ object DatabaseModule {
         return Room.databaseBuilder(
             context,
             AppDatabase::class.java,
-            "app_database"
+            AppDatabase.DATABASE_NAME
         ).build()
     }
 

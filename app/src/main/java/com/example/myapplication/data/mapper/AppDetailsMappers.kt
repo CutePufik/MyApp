@@ -1,6 +1,6 @@
 package com.example.myapplication.data.mapper
 
-import com.example.myapplication.data.local.entity.AppDetailsEntity
+import com.example.myapplication.data.appdetails.local.AppDetailsEntity
 import com.example.myapplication.domain.model.App
 import com.example.myapplication.domain.model.AppDetails
 
