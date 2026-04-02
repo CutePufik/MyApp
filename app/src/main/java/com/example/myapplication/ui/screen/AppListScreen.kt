@@ -26,9 +26,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,40 +36,28 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.lifecycle.Observer
 import com.example.myapplication.R
 import com.example.myapplication.domain.model.App
 import com.example.myapplication.presentation.AppListUiState
 import com.example.myapplication.presentation.AppListViewModel
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import coil.compose.AsyncImage
-import kotlinx.coroutines.launch
 
 @Composable
 fun AppListScreen(
     viewModel: AppListViewModel,
     onAppClick: (String) -> Unit
 ) {
-    val uiState by viewModel.uiState.observeAsState(AppListUiState())
+    val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val logoClickedMessage = stringResource(R.string.logo_clicked_snackbar)
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val scope = rememberCoroutineScope()
 
-    DisposableEffect(viewModel, lifecycleOwner, snackbarHostState, logoClickedMessage) {
-        val observer = Observer<Boolean> { show ->
-            if (show == true) {
-                viewModel.onLogoSnackbarShown()
-                scope.launch {
-                    snackbarHostState.showSnackbar(message = logoClickedMessage)
-                }
-            }
+    LaunchedEffect(viewModel, snackbarHostState, logoClickedMessage) {
+        viewModel.logoClickEvents.collect {
+            snackbarHostState.showSnackbar(message = logoClickedMessage)
         }
-        viewModel.showLogoClickedSnackbar.observe(lifecycleOwner, observer)
-        onDispose { viewModel.showLogoClickedSnackbar.removeObserver(observer) }
     }
 
     AppListScreen(

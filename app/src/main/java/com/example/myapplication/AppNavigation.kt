@@ -1,17 +1,14 @@
 package com.example.myapplication
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.myapplication.presentation.AppDetailsUiState
-import com.example.myapplication.presentation.AppDetailsViewModel
 import com.example.myapplication.presentation.AppListViewModel
+import com.example.myapplication.presentation.AppDetailsViewModel
 import com.example.myapplication.ui.screen.AppDetailsScreen
 import com.example.myapplication.ui.screen.AppListScreen
 
@@ -45,14 +42,10 @@ fun AppNavigation() {
             )
         ) { backStackEntry ->
             val viewModel: AppDetailsViewModel = hiltViewModel(backStackEntry)
-            val uiState by viewModel.uiState.observeAsState(AppDetailsUiState())
-
-            uiState.app?.let { app ->
-                AppDetailsScreen(
-                    app = app,
-                    onBackClick = { navController.popBackStack() }
-                )
-            }
+            AppDetailsScreen(
+                viewModel = viewModel,
+                onBackClick = { navController.popBackStack() }
+            )
         }
     }
 }
