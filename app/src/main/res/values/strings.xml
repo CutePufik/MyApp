@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">My Application</string>
+    <string name="rustore_title">RuStore</string>
+    <string name="menu_content_description">Меню</string>
+    <string name="logo_clicked_snackbar">Логотип нажат</string>
+
+    <string name="back_content_description">Назад</string>
+    <string name="app_details_title">Карточка приложения</string>
+    <string name="install_button">Установить</string>
+    <string name="app_details_error">Не удалось загрузить данные</string>
+    <string name="wishlist_add_content_description">Добавить в избранное</string>
+    <string name="wishlist_remove_content_description">Убрать из избранного</string>
 </resources>
